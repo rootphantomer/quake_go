@@ -13,7 +13,7 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/fatih/color"
+	"github.com/sirupsen/logrus"
 )
 
 func FilterableServiceGET(token string) {
@@ -23,7 +23,7 @@ func FilterableServiceGET(token string) {
 	Apis(URL+uri, "GET", []byte{}, token)
 }
 func SearchServicePost(reqjson Reqjson, token string) string {
-	logcolor := color.New(color.FgGreen)
+
 	// 服务数据实时查询接口
 	// curl -X POST "https://quake.360.cn/api/v3/search/quake_service" -H "X-QuakeToken: d17140ae-xxxx-xxx-xxxx-c0818b2bbxxx" -H "Content-Type: application/json" -d '{
 	//      "query": "service: http",
@@ -60,7 +60,7 @@ func SearchServicePost(reqjson Reqjson, token string) string {
 		panic(err)
 	}
 	fmt.Println("->", string(URL+uri))
-	logcolor.Println(string(datajson))
+	logrus.Info(string(datajson))
 	body := Apis(URL+uri, "POST", datajson, token)
 	return body
 
@@ -121,7 +121,6 @@ func HostSearchPost(reqjson Reqjson, token string) string {
 	//	     "start_time": "2021-01-01 00:00:00",
 	//	     "end_time": "2021-02-01 00:00:00"
 	//	}'
-	logcolor := color.New(color.FgGreen)
 	uri := "/search/quake_host"
 	if reqjson.QueryTxt != "" {
 		bytedata, _ := ReadLine(reqjson.QueryTxt)
@@ -149,7 +148,7 @@ func HostSearchPost(reqjson Reqjson, token string) string {
 		panic(err)
 	}
 	fmt.Println("->", string(URL+uri))
-	logcolor.Println(string(datajson))
+	logrus.Info(string(datajson))
 	body := Apis(URL+uri, "POST", datajson, token)
 	return body
 

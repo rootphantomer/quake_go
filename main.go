@@ -12,7 +12,7 @@ package main
 
 import (
 	"github.com/360quake/quake_go/utils"
-	"github.com/fatih/color"
+	"github.com/sirupsen/logrus"
 	"os"
 	"runtime"
 	"strconv"
@@ -25,9 +25,7 @@ import (
 )
 
 var (
-	reqjson      utils.Reqjson
-	successColor = color.New(color.FgBlue)
-	errorColor   = color.New(color.FgRed)
+	reqjson utils.Reqjson
 )
 
 func main() {
@@ -36,7 +34,7 @@ func main() {
 }
 
 func hflagInit() (num int) {
-	successColor.Println("Starting Quake Cli...")
+	logrus.Info("Starting Quake Cli...")
 	hflag.AddFlag("start", "-st to start number", hflag.Shorthand("st"), hflag.Type("string"), hflag.DefaultValue("0"))
 	hflag.AddFlag("size", "-sz to size number ", hflag.Shorthand("sz"), hflag.Type("string"), hflag.DefaultValue("10"))
 	hflag.AddFlag("ignore_cache", "-ic true or false,default false", hflag.Shorthand("ic"), hflag.Type("bool"), hflag.DefaultValue("false"))
@@ -51,7 +49,7 @@ func hflagInit() (num int) {
 	}
 	num = len(os.Args)
 	if num < 2 {
-		errorColor.Println("./quake -h get help!")
+		logrus.Error("./quake -h get help!")
 		os.Exit(0)
 	}
 	return
@@ -67,15 +65,15 @@ func action(num int) {
 	reqjson.Field = hflag.GetString("field")
 	reqjson.QueryTxt = hflag.GetString("file_txt")
 	if sizelen, _ := strconv.Atoi(reqjson.Size); sizelen > 50 {
-		errorColor.Println("size only less than or equal to 50")
+		logrus.Error("size only less than or equal to 50")
 		return
 	}
 	switch strings.ToLower(hflag.GetString("option")) {
 	case "version":
-		successColor.Printf("Clash %s %s %s with %s \n", "2.0.3", runtime.GOOS, runtime.GOARCH, runtime.Version())
+		logrus.Info("Clash %s %s %s with %s \n", "2.0.3", runtime.GOOS, runtime.GOARCH, runtime.Version())
 	case "init":
 		if num < 3 {
-			errorColor.Println("!!!!token is empty !!!!")
+			logrus.Error("!!!!token is empty !!!!")
 			return
 		}
 		utils.WriteYaml("./config.yaml", reqjson.Query)
@@ -86,12 +84,12 @@ func action(num int) {
 		}
 		info := utils.InfoGet(token.Token)
 		dataResult, userResult := utils.InfoLoadJson(info)
-		successColor.Println("#用户名:", userResult["username"])
-		successColor.Println("#邮  箱:", userResult["email"])
-		successColor.Println("#手机:", dataResult["mobile_phone"])
-		successColor.Println("#月度积分:", dataResult["month_remaining_credit"])
-		successColor.Println("#长效积分:", dataResult["constant_credit"])
-		successColor.Println("#Token:", dataResult["token"])
+		logrus.Info("#用户名:", userResult["username"])
+		logrus.Info("#邮  箱:", userResult["email"])
+		logrus.Info("#手机:", dataResult["mobile_phone"])
+		logrus.Info("#月度积分:", dataResult["month_remaining_credit"])
+		logrus.Info("#长效积分:", dataResult["constant_credit"])
+		logrus.Info("#Token:", dataResult["token"])
 	case "search":
 		token, status := utils.ReadYaml("./config.yaml")
 		if !status {
@@ -102,14 +100,14 @@ func action(num int) {
 		if reqjson.Field != "" && reqjson.Field != "ip,port" {
 			for index, value := range dataResult {
 				if value.Service.HTTP[reqjson.Field] == nil {
-					successColor.Println(strconv.Itoa(index+1) + "# " + value.IP + ":" + "  " + strconv.Itoa(value.Port))
+					logrus.Info(strconv.Itoa(index+1) + "# " + value.IP + ":" + "  " + strconv.Itoa(value.Port))
 				} else {
-					successColor.Println(strconv.Itoa(index+1) + "# " + value.IP + ":" + strconv.Itoa(value.Port) + "  " + value.Service.HTTP[reqjson.Field].(string))
+					logrus.Info(strconv.Itoa(index+1) + "# " + value.IP + ":" + strconv.Itoa(value.Port) + "  " + value.Service.HTTP[reqjson.Field].(string))
 				}
 			}
 		} else {
 			for index, value := range dataResult {
-				successColor.Println(strconv.Itoa(index+1) + "# " + value.IP + ":" + strconv.Itoa(value.Port))
+				logrus.Info(strconv.Itoa(index+1) + "# " + value.IP + ":" + strconv.Itoa(value.Port))
 			}
 		}
 	case "host":
@@ -120,7 +118,7 @@ func action(num int) {
 		body := utils.HostSearchPost(reqjson, token.Token)
 		dataResult := utils.RespLoadJson[utils.SearchJson](body).Data
 		for index, value := range dataResult {
-			successColor.Println(strconv.Itoa(index+1) + "# " + value.IP)
+			logrus.Info(strconv.Itoa(index+1) + "# " + value.IP)
 		}
 	// case "favicon":
 	// 	fmt.Println("favicon相似度接口待完成。。。")
@@ -132,6 +130,6 @@ func action(num int) {
 	// case "domain":
 	// 	fmt.Println("domain ")
 	default:
-		errorColor.Println("args failed !!!!")
+		logrus.Error("args failed !!!!")
 	}
 }

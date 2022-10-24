@@ -13,14 +13,13 @@ package utils
 import (
 	"bytes"
 	"fmt"
-	"github.com/fatih/color"
+	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
 	"strings"
 )
 
 func Apis(url string, method string, data []byte, token string) string {
-	errcolor := color.New(color.FgRed)
 	client := &http.Client{}
 	var req *http.Request
 	var err error
@@ -31,7 +30,7 @@ func Apis(url string, method string, data []byte, token string) string {
 		req, err = http.NewRequest("GET", url, nil)
 	}
 	if err != nil {
-		errcolor.Println(err)
+		logrus.Error(err)
 		return err.Error()
 	}
 	req.Header.Add("X-QuakeToken", token)
@@ -39,25 +38,25 @@ func Apis(url string, method string, data []byte, token string) string {
 
 	res, err := client.Do(req)
 	if err != nil {
-		errcolor.Println(err)
+		logrus.Error(err)
 		return err.Error()
 	}
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-			errcolor.Println(err)
+			logrus.Error(err)
 		}
 	}(res.Body)
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
-		errcolor.Println(err)
+		logrus.Error(err)
 		return err.Error()
 	}
 	fmt.Println("result:")
 	// fmt.Println(string(body))
 	if strings.Contains(string(body), "quake/login") {
-		errcolor.Println("token expired,please init new token")
+		logrus.Error("token expired,please init new token")
 	}
 	return string(body)
 }
