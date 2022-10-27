@@ -29,7 +29,7 @@ var (
 )
 
 func main() {
-	maxprocs.Set(maxprocs.Logger(func(string, ...any) {}))
+	_, _ = maxprocs.Set(maxprocs.Logger(func(string, ...any) {}))
 	action(hflagInit())
 }
 
@@ -49,7 +49,7 @@ func hflagInit() (num int) {
 	}
 	num = len(os.Args)
 	if num < 2 {
-		logrus.Error("./quake -h get help!")
+		logrus.Warnf("./quake -h get help!")
 		os.Exit(0)
 	}
 	return
@@ -65,7 +65,7 @@ func action(num int) {
 	reqjson.Field = hflag.GetString("field")
 	reqjson.QueryTxt = hflag.GetString("file_txt")
 	if sizelen, _ := strconv.Atoi(reqjson.Size); sizelen > 50 {
-		logrus.Error("size only less than or equal to 50")
+		logrus.Warnf("size only less than or equal to 50")
 		return
 	}
 	switch strings.ToLower(hflag.GetString("option")) {
