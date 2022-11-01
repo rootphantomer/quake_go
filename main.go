@@ -11,6 +11,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/360quake/quake_go/utils"
 	"github.com/sirupsen/logrus"
 	"os"
@@ -84,12 +85,12 @@ func action(num int) {
 		}
 		info := utils.InfoGet(token.Token)
 		dataResult, userResult := utils.InfoLoadJson(info)
-		logrus.Info("#用户名:", userResult["username"])
-		logrus.Info("#邮  箱:", userResult["email"])
-		logrus.Info("#手机:", dataResult["mobile_phone"])
-		logrus.Info("#月度积分:", dataResult["month_remaining_credit"])
-		logrus.Info("#长效积分:", dataResult["constant_credit"])
-		logrus.Info("#Token:", dataResult["token"])
+		fmt.Println("#用户名:", userResult["username"])
+		fmt.Println("#邮  箱:", userResult["email"])
+		fmt.Println("#手机:", dataResult["mobile_phone"])
+		fmt.Println("#月度积分:", dataResult["month_remaining_credit"])
+		fmt.Println("#长效积分:", dataResult["constant_credit"])
+		fmt.Println("#Token:", dataResult["token"])
 	case "search":
 		token, status := utils.ReadYaml("./config.yaml")
 		if !status {
@@ -100,14 +101,14 @@ func action(num int) {
 		if reqjson.Field != "" && reqjson.Field != "ip,port" {
 			for index, value := range dataResult {
 				if value.Service.HTTP[reqjson.Field] == nil {
-					logrus.Info(strconv.Itoa(index+1) + "# " + value.IP + ":" + "  " + strconv.Itoa(value.Port))
+					fmt.Println(strconv.Itoa(index+1) + "# " + value.IP + ":" + "  " + strconv.Itoa(value.Port))
 				} else {
-					logrus.Info(strconv.Itoa(index+1) + "# " + value.IP + ":" + strconv.Itoa(value.Port) + "  " + value.Service.HTTP[reqjson.Field].(string))
+					fmt.Println(strconv.Itoa(index+1) + "# " + value.IP + ":" + strconv.Itoa(value.Port) + "  " + value.Service.HTTP[reqjson.Field].(string))
 				}
 			}
 		} else {
 			for index, value := range dataResult {
-				logrus.Info(strconv.Itoa(index+1) + "# " + value.IP + ":" + strconv.Itoa(value.Port))
+				fmt.Println(strconv.Itoa(index+1) + "# " + value.IP + ":" + strconv.Itoa(value.Port))
 			}
 		}
 	case "host":
@@ -118,7 +119,7 @@ func action(num int) {
 		body := utils.HostSearchPost(reqjson, token.Token)
 		dataResult := utils.RespLoadJson[utils.SearchJson](body).Data
 		for index, value := range dataResult {
-			logrus.Info(strconv.Itoa(index+1) + "# " + value.IP)
+			fmt.Println(strconv.Itoa(index+1) + "# " + value.IP)
 		}
 	// case "favicon":
 	// 	fmt.Println("favicon相似度接口待完成。。。")
